@@ -88,10 +88,65 @@ const getMenuById = async (menuId: string) => {
   return result;
 };
 
+const updateMenu = async (menuId: string, payload: IMenu, files: any) => {
+  const isMenuExist = await Menu.findById(menuId);
+  if (!isMenuExist) {
+    throw new AppError("Menu not found", StatusCodes.NOT_FOUND);
+  }
+
+  let images: { public_id: string; url: string }[] = [];
+
+  // ----- Handle file uploads -----
+  if (files && files.length > 0) {
+    const uploadPromises = files.map((file: Express.Multer.File) =>
+      uploadToCloudinary(file.path, "products")
+    );
+    const uploadedResults = await Promise.all(uploadPromises);
+
+    images = uploadedResults.map((uploaded: any) => ({
+      public_id: uploaded.public_id ?? "",
+      url: uploaded.secure_url,
+    }));
+
+    // Delete old images if provided
+    if (payload.images && payload.images.length > 0) {
+      const oldImagesPublicIds = payload.images.map(
+        (img) => img.public_id ?? ""
+      );
+      await Promise.all(
+        oldImagesPublicIds.map((publicId) => deleteFromCloudinary(publicId))
+      );
+    }
+  } else {
+    images = (payload.images || []).map((img) => ({
+      public_id: img.public_id ?? "",
+      url: img.url ?? "",
+    }));
+  }
+
+  const result = await Menu.findOneAndUpdate(
+    { _id: menuId },
+    { ...payload, images },
+    { new: true }
+  );
+  return result;
+};
+
+const deleteMenu = async (menuId: string) => {
+  const isMenuExist = await Menu.findById(menuId);
+  if (!isMenuExist) {
+    throw new AppError("Menu not found", StatusCodes.NOT_FOUND);
+  }
+
+  await Menu.findByIdAndDelete(menuId);
+};
+
 const menuService = {
   createMenu,
   getAllMenus,
   getMenuById,
+  updateMenu,
+  deleteMenu,
 };
 
 export default menuService;

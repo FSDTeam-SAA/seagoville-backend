@@ -45,10 +45,36 @@ const getMenuById = catchAsync(async (req, res) => {
   });
 });
 
+const updateMenu = catchAsync(async (req, res) => {
+  const { menuId } = req.params;
+  const files: any = req.files;
+  const result = await menuService.updateMenu(menuId, req.body, files);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Menu updated successfully",
+    data: result,
+  });
+});
+
+const deleteMenu = catchAsync(async (req, res) => {
+  const { menuId } = req.params;
+  await menuService.deleteMenu(menuId);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Menu deleted successfully",
+  });
+});
+
 const menuController = {
   createMenu,
   getAllMenus,
   getMenuById,
+  updateMenu,
+  deleteMenu,
 };
 
 export default menuController;

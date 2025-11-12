@@ -7,8 +7,15 @@ const router = Router();
 router.post("/new-menu", upload.array("images", 10), menuController.createMenu);
 
 router.get("/all-menus", menuController.getAllMenus);
-
 router.get("/:menuId", menuController.getMenuById);
+
+router.put(
+  "/update-menu/:menuId",
+  upload.array("images", 10),
+  menuController.updateMenu
+);
+
+router.delete("/delete-menu/:menuId", menuController.deleteMenu);
 
 const menuRouter = router;
 export default menuRouter;
