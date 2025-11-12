@@ -5,7 +5,7 @@ export interface IMenu {
   images: {
     public_id: string;
     url: string;
-  };
+  }[];
   price: {
     small: number;
     medium: number;
