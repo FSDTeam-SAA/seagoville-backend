@@ -13,5 +13,15 @@ router.post(
 router.get("/", toppingsController.getAllToppings);
 router.get("/all-toppings", toppingsController.getAllToppingsForAdmin);
 
+router.get("/:id", toppingsController.getSingleTopping);
+router.put("/toggle-status/:id", toppingsController.toggleToppingStatus);
+
+router.put(
+  "/update-topping/:id",
+  upload.single("image"),
+  toppingsController.updateTopping
+);
+router.delete("/delete/:id", toppingsController.deleteTopping);
+
 const toppingsRouter = router;
 export default toppingsRouter;

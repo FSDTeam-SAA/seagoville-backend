@@ -46,10 +46,61 @@ const getAllToppingsForAdmin = catchAsync(async (req, res) => {
   });
 });
 
+const getSingleTopping = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await toppingsService.getSingleTopping(id);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Topping get successfully",
+    data: result,
+  });
+});
+
+const toggleToppingStatus = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await toppingsService.toggleToppingStatus(id);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Topping status toggled successfully",
+    data: result,
+  });
+});
+
+const updateTopping = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await toppingsService.updateTopping(id, req.body, req.file);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Topping updated successfully",
+    data: result,
+  });
+});
+
+const deleteTopping = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  await toppingsService.deleteTopping(id);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Topping deleted successfully",
+  });
+});
+
 const toppingsController = {
   createNewTopping,
   getAllToppings,
   getAllToppingsForAdmin,
+  getSingleTopping,
+  toggleToppingStatus,
+  updateTopping,
+  deleteTopping,
 };
 
 export default toppingsController;

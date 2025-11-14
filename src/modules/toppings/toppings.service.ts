@@ -1,5 +1,10 @@
 /* eslint-disable prefer-const */
-import { uploadToCloudinary } from "../../utils/cloudinary";
+import { StatusCodes } from "http-status-codes";
+import AppError from "../../errors/AppError";
+import {
+  deleteFromCloudinary,
+  uploadToCloudinary,
+} from "../../utils/cloudinary";
 import { ITopping } from "./toppings.interface";
 import Toppings from "./toppings.model";
 
@@ -66,11 +71,82 @@ const getAllToppingsForAdmin = async (
   };
 };
 
+const getSingleTopping = async (id: string) => {
+  const isToppingExists = await Toppings.findOne({ _id: id });
+  if (!isToppingExists) {
+    throw new Error("Topping not found");
+  }
+
+  const result = await Toppings.findOne({ _id: id, isAvailable: true });
+  return result;
+};
+
+const toggleToppingStatus = async (id: string) => {
+  const isToppingExists = await Toppings.findOne({ _id: id });
+  if (!isToppingExists) {
+    throw new Error("Topping not found");
+  }
+
+  const result = await Toppings.findOneAndUpdate(
+    { _id: id },
+    [{ $set: { isAvailable: { $not: "$isAvailable" } } }],
+    { new: true }
+  );
+  return result;
+};
+
+const updateTopping = async (id: string, payload: ITopping, file: any) => {
+  let imageData = {
+    public_id: "",
+    url: "",
+  };
+
+  if (file) {
+    const uploadResult = await uploadToCloudinary(file.path, "toppings");
+    imageData.public_id = uploadResult.public_id;
+    imageData.url = uploadResult.secure_url;
+
+    if (payload.image && payload.image.public_id) {
+      await deleteFromCloudinary(payload.image.public_id);
+    }
+  }
+
+  const result = await Toppings.findOneAndUpdate(
+    { _id: id },
+    {
+      $set: {
+        name: payload.name,
+        price: payload.price,
+        category: payload.category,
+        image: imageData,
+      },
+    },
+    { new: true }
+  );
+  return result;
+};
+
+const deleteTopping = async (id: string) => {
+  const isToppingExists = await Toppings.findOne({ _id: id });
+  if (!isToppingExists) {
+    throw new Error("Topping not found");
+  }
+
+  if (isToppingExists.isAvailable === true) {
+    throw new AppError("Topping is available", StatusCodes.BAD_REQUEST);
+  }
+
+  await Toppings.findOneAndDelete({ _id: id });
+};
 
 const toppingsService = {
   createNewTopping,
   getAllToppings,
   getAllToppingsForAdmin,
+  toggleToppingStatus,
+  getSingleTopping,
+  updateTopping,
+  deleteTopping,
 };
 
 export default toppingsService;
