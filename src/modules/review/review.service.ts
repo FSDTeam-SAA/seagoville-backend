@@ -6,9 +6,27 @@ const createReview = async (payload: IReview) => {
   return result;
 };
 
-const getAllReviews = async () => {
-  const result = await review.find();
-  return result;
+const getAllReviews = async (page: number = 1, limit: number = 10) => {
+  const skip = (page - 1) * limit;
+
+  const reviews = await review
+    .find()
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+
+  const total = await review.countDocuments();
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages,
+    },
+    data: reviews,
+  };
 };
 
 const getSingleReview = async (id: string) => {

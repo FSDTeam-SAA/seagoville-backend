@@ -15,15 +15,20 @@ const createReview = catchAsync(async (req, res) => {
 });
 
 const getAllReviews = catchAsync(async (req, res) => {
-  const result = await reviewService.getAllReviews();
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+
+  const result = await reviewService.getAllReviews(page, limit);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
     message: "Reviews fetched successfully",
-    data: result,
+    meta: result.meta,
+    data: result.data,
   });
 });
+
 
 const getSingleReview = catchAsync(async (req, res) => {
   const { reviewId } = req.params;

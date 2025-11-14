@@ -11,10 +11,28 @@ const getAllCoupons = async () => {
   return result;
 };
 
-const getAllCouponsForAdmin = async () => {
-  const result = await Coupon.find();
-  return result;
+const getAllCouponsForAdmin = async (page: number = 1, limit: number = 10) => {
+  const skip = (page - 1) * limit;
+
+  const coupons = await Coupon.find()
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+
+  const total = await Coupon.countDocuments();
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages,
+    },
+    data: coupons,
+  };
 };
+
 
 const getSingleCoupon = async (couponId: string) => {
   const isCouponExist = await Coupon.findById(couponId);

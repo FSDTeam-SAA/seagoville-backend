@@ -26,13 +26,17 @@ const getAllCoupons = catchAsync(async (req, res) => {
 });
 
 const getAllCouponsForAdmin = catchAsync(async (req, res) => {
-  const result = await couponService.getAllCouponsForAdmin();
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+
+  const result = await couponService.getAllCouponsForAdmin(page, limit);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
     message: "Coupons fetched successfully",
-    data: result,
+    meta: result.meta,
+    data: result.data,
   });
 });
 
