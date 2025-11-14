@@ -7,6 +7,7 @@ import reviewRouter from "../modules/review/review.router";
 import subscriptionRouter from "../modules/subscription/subscription.router";
 import toppingsRouter from "../modules/toppings/toppings.router";
 import userRouter from "../modules/user/user.router";
+import analysisRouter from "../modules/analysis/analysis.router";
 
 const router = Router();
 
@@ -42,6 +43,10 @@ const moduleRoutes = [
   {
     path: "/toppings",
     route: toppingsRouter,
+  },
+  {
+    path: "/analysis",
+    route: analysisRouter,
   },
 ];
 
