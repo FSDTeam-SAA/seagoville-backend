@@ -5,6 +5,7 @@ import couponsRouter from "../modules/coupons/coupons.router";
 import menuRouter from "../modules/menu/menu.route";
 import reviewRouter from "../modules/review/review.router";
 import userRouter from "../modules/user/user.router";
+import subscriptionRouter from "../modules/subscription/subscription.router";
 
 const router = Router();
 
@@ -33,6 +34,10 @@ const moduleRoutes = [
     path: "/review",
     route: reviewRouter,
   },
+  {
+    path: "/subscription",
+    route: subscriptionRouter,
+  }
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
