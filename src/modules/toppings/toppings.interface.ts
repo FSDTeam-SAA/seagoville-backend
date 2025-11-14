@@ -6,4 +6,5 @@ export interface ITopping {
     public_id: string;
     url: string;
   };
+  isAvailable: boolean;
 }
