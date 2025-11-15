@@ -7,6 +7,7 @@ const router = Router();
 
 router.post("/new-review", reviewController.createReview);
 router.get("/", reviewController.getAllReviews);
+router.get("/approved-reviews", reviewController.getApprovedReviews);
 router.get("/:reviewId", reviewController.getSingleReview);
 router.delete(
   "/delete-review/:reviewId",
