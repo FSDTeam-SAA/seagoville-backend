@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import AppError from "../../errors/AppError";
+import Cart from "../cart/cart.model";
 import Toppings from "../toppings/toppings.model";
 import { IOwnPizza } from "./ownPizza.interface";
 import ownPizza from "./ownPizza.model";
@@ -65,6 +66,14 @@ const createOwnPizza = async (payload: IOwnPizza, deviceIp: string) => {
     toppings,
     totalPrice: price,
     deviceIp,
+  });
+
+  await Cart.create({
+    type: "ownPizza",
+    totalPrice: price, 
+    ownPizzaId: result._id, 
+    menuId: null,
+    deviceIp, 
   });
 
   return result;

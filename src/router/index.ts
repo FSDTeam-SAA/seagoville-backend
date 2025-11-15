@@ -1,6 +1,7 @@
 import { Router } from "express";
 import analysisRouter from "../modules/analysis/analysis.router";
 import authRouter from "../modules/auth/auth.router";
+import cartRouter from "../modules/cart/cart.router";
 import contactRouter from "../modules/contact/contact.router";
 import couponsRouter from "../modules/coupons/coupons.router";
 import menuRouter from "../modules/menu/menu.route";
@@ -52,6 +53,10 @@ const moduleRoutes = [
   {
     path: "/own-pizza",
     route: ownPizzaRouter,
+  },
+  {
+    path: "/add-cart",
+    route: cartRouter,
   },
 ];
 
