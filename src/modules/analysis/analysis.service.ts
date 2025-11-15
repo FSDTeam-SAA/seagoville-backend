@@ -1,3 +1,5 @@
+import { Coupon } from "../coupons/coupons.model";
+import review from "../review/review.model";
 import Toppings from "../toppings/toppings.model";
 
 const toppingsAnalysis = async () => {
@@ -22,8 +24,55 @@ const toppingsAnalysis = async () => {
   };
 };
 
+const getReviewAnalysis = async () => {
+  const totalReviews = await review.countDocuments();
+  const pendingReviews = await review.countDocuments({ status: "pending" });
+  const approvedReview = await review.countDocuments({ status: "approved" });
+  const averageRating = await review
+    .aggregate([
+      {
+        $group: {
+          _id: null,
+          averageRating: { $avg: "$rating" },
+        },
+      },
+    ])
+    .then((result) => result[0]?.averageRating || 0);
+
+  return Promise.all([
+    totalReviews,
+    pendingReviews,
+    approvedReview,
+    averageRating,
+  ]);
+};
+
+const couponsAnalysis = async () => {
+  const totalCoupons = await Coupon.countDocuments();
+  const activeCoupons = await Coupon.countDocuments({
+    isActive: true,
+  });
+
+  const totalUses = await Coupon.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalUses: { $sum: "$timesUsed" },
+      },
+    },
+  ]);
+
+  return {
+    totalCoupons,
+    activeCoupons,
+    totalUses: totalUses[0]?.totalUses || 0,
+  };
+};
+
 const analysisService = {
   toppingsAnalysis,
+  getReviewAnalysis,
+  couponsAnalysis,
 };
 
 export default analysisService;

@@ -14,10 +14,32 @@ const toppingsAnalysis = catchAsync(async (req, res) => {
   });
 });
 
+const getReviewAnalysis = catchAsync(async (req, res) => {
+  const result = await analysisService.getReviewAnalysis();
 
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Reviews fetched successfully",
+    data: result,
+  });
+});
+
+const couponsAnalysis = catchAsync(async (req, res) => {
+  const result = await analysisService.couponsAnalysis();
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Coupons fetched successfully",
+    data: result,
+  });
+});
 
 const analysisController = {
   toppingsAnalysis,
+  getReviewAnalysis,
+  couponsAnalysis,
 };
 
 export default analysisController;
