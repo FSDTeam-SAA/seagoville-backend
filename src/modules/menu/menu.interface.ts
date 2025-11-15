@@ -11,4 +11,5 @@ export interface IMenu {
     medium: number;
     large: number;
   };
+  isAvailable: boolean;
 }

@@ -33,6 +33,24 @@ const getAllMenus = catchAsync(async (req, res) => {
   });
 });
 
+const getAllMenusForAdmin = catchAsync(async (req, res) => {
+  const { page = 1, limit = 10, category } = req.query;
+
+  const result = await menuService.getAllMenusForAdmin({
+    page: Number(page),
+    limit: Number(limit),
+    category: category as string,
+  });
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Menus fetched successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
 const getMenuById = catchAsync(async (req, res) => {
   const { menuId } = req.params;
   const result = await menuService.getMenuById(menuId);
@@ -58,6 +76,18 @@ const updateMenu = catchAsync(async (req, res) => {
   });
 });
 
+const toggleMenuStatus = catchAsync(async (req, res) => {
+  const { menuId } = req.params;
+  const result = await menuService.toggleMenuStatus(menuId);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Menu status toggled successfully",
+    data: result,
+  });
+});
+
 const deleteMenu = catchAsync(async (req, res) => {
   const { menuId } = req.params;
   await menuService.deleteMenu(menuId);
@@ -72,8 +102,10 @@ const deleteMenu = catchAsync(async (req, res) => {
 const menuController = {
   createMenu,
   getAllMenus,
+  getAllMenusForAdmin,
   getMenuById,
   updateMenu,
+  toggleMenuStatus,
   deleteMenu,
 };
 

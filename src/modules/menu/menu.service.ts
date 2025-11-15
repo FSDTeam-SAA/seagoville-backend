@@ -53,6 +53,38 @@ const getAllMenus = async (query: {
 }) => {
   const { page, limit, category } = query;
 
+  const filter: any = { isAvailable: true };
+  if (category) {
+    filter.category = { $regex: new RegExp(category, "i") }; // case-insensitive
+  }
+
+  const skip = (page - 1) * limit;
+
+  const [menus, total] = await Promise.all([
+    Menu.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }),
+    Menu.countDocuments(filter),
+  ]);
+
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    meta: {
+      total,
+      page,
+      totalPages,
+      limit,
+    },
+    data: menus,
+  };
+};
+
+const getAllMenusForAdmin = async (query: {
+  page: number;
+  limit: number;
+  category?: string;
+}) => {
+  const { page, limit, category } = query;
+
   const filter: any = {};
   if (category) {
     filter.category = { $regex: new RegExp(category, "i") }; // case-insensitive
@@ -132,6 +164,20 @@ const updateMenu = async (menuId: string, payload: IMenu, files: any) => {
   return result;
 };
 
+const toggleMenuStatus = async (menuId: string) => {
+  const isMenuExist = await Menu.findById(menuId);
+  if (!isMenuExist) {
+    throw new AppError("Menu not found", StatusCodes.NOT_FOUND);
+  }
+
+  const result = await Menu.findOneAndUpdate(
+    { _id: menuId },
+    { isAvailable: !isMenuExist.isAvailable },
+    { new: true }
+  );
+  return result;
+};
+
 const deleteMenu = async (menuId: string) => {
   const isMenuExist = await Menu.findById(menuId);
   if (!isMenuExist) {
@@ -144,8 +190,10 @@ const deleteMenu = async (menuId: string) => {
 const menuService = {
   createMenu,
   getAllMenus,
+  getAllMenusForAdmin,
   getMenuById,
   updateMenu,
+  toggleMenuStatus,
   deleteMenu,
 };
 

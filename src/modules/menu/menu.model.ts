@@ -40,6 +40,10 @@ const menuSchema = new Schema<IMenu>(
         min: 0,
       },
     },
+    isAvailable: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,

@@ -16,7 +16,7 @@ const getAllReviews = async (
 
   const filter: any = {};
   if (status !== "all") filter.status = status;
-  if (rating) filter.rating = rating; 
+  if (rating) filter.rating = rating;
 
   const reviews = await review
     .find(filter)
