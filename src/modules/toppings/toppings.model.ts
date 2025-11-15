@@ -9,7 +9,6 @@ const toppingsModel = new Schema<ITopping>(
     },
     price: {
       type: Number,
-      required: true,
     },
     category: {
       type: String,

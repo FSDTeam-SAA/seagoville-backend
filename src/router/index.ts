@@ -1,13 +1,14 @@
 import { Router } from "express";
+import analysisRouter from "../modules/analysis/analysis.router";
 import authRouter from "../modules/auth/auth.router";
 import contactRouter from "../modules/contact/contact.router";
 import couponsRouter from "../modules/coupons/coupons.router";
 import menuRouter from "../modules/menu/menu.route";
+import ownPizzaRouter from "../modules/ownPizza/ownPizza.router";
 import reviewRouter from "../modules/review/review.router";
 import subscriptionRouter from "../modules/subscription/subscription.router";
 import toppingsRouter from "../modules/toppings/toppings.router";
 import userRouter from "../modules/user/user.router";
-import analysisRouter from "../modules/analysis/analysis.router";
 
 const router = Router();
 
@@ -47,6 +48,10 @@ const moduleRoutes = [
   {
     path: "/analysis",
     route: analysisRouter,
+  },
+  {
+    path: "/own-pizza",
+    route: ownPizzaRouter,
   },
 ];
 
