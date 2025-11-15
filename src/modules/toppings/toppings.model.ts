@@ -18,16 +18,18 @@ const toppingsModel = new Schema<ITopping>(
     image: {
       public_id: {
         type: String,
-        required: true,
       },
       url: {
         type: String,
-        required: true,
       },
     },
     isAvailable: {
       type: Boolean,
       default: true,
+    },
+    description: {
+      type: String,
+      required: true,
     },
   },
   {

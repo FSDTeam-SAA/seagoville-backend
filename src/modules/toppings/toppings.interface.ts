@@ -7,4 +7,5 @@ export interface ITopping {
     url: string;
   };
   isAvailable: boolean;
+  description: string;
 }

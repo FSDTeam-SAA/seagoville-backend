@@ -25,6 +25,7 @@ const createNewTopping = async (payload: ITopping, file: any) => {
     price: payload.price,
     category: payload.category,
     image: imageData,
+    description: payload.description,
   });
 
   return newTopping;
@@ -119,6 +120,7 @@ const updateTopping = async (id: string, payload: ITopping, file: any) => {
         price: payload.price,
         category: payload.category,
         image: imageData,
+        description: payload.description,
       },
     },
     { new: true }
