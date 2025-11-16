@@ -37,8 +37,39 @@ const createPayment = async (
   };
 };
 
+const confirmPayment = async (payload: { transactionId: string }) => {
+  const { transactionId } = payload;
+
+  // 1️⃣ Retrieve payment intent from Stripe
+  const paymentIntent = await stripe.paymentIntents.retrieve(transactionId);
+
+  // 2️⃣ Determine status
+  const status: "success" | "failed" =
+    paymentIntent.status === "succeeded" ? "success" : "failed";
+
+  // 3️⃣ Update payment record in DB
+  const updatedPayment = await Payment.findOneAndUpdate(
+    { transactionId },
+    { status },
+    { new: true }
+  );
+
+  if (!updatedPayment) {
+    throw new AppError("Payment not found", StatusCodes.NOT_FOUND);
+  }
+
+  return {
+    paymentId: updatedPayment._id,
+    status: updatedPayment.status,
+    amount: updatedPayment.amount,
+    stripeStatus: paymentIntent.status,
+  };
+};
+
+
 const paymentService = {
   createPayment,
+  confirmPayment,
 };
 
 export default paymentService;

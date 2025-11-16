@@ -22,8 +22,25 @@ const createPayment = catchAsync(async (req, res) => {
   });
 });
 
+const confirmPayment = catchAsync(async (req, res) => {
+  const result = await paymentService.confirmPayment(req.body);
+
+  const message =
+    result.status === "success"
+      ? "Payment confirmed successfully"
+      : "Payment failed";
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message,
+    data: result,
+  });
+});
+
 const paymentController = {
   createPayment,
+  confirmPayment,
 };
 
 export default paymentController;
