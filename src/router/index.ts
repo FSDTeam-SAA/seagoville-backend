@@ -5,7 +5,9 @@ import cartRouter from "../modules/cart/cart.router";
 import contactRouter from "../modules/contact/contact.router";
 import couponsRouter from "../modules/coupons/coupons.router";
 import menuRouter from "../modules/menu/menu.route";
+import orderRouter from "../modules/order/order.router";
 import ownPizzaRouter from "../modules/ownPizza/ownPizza.router";
+import paymentRouter from "../modules/payment/payment.router";
 import reviewRouter from "../modules/review/review.router";
 import subscriptionRouter from "../modules/subscription/subscription.router";
 import toppingsRouter from "../modules/toppings/toppings.router";
@@ -58,6 +60,14 @@ const moduleRoutes = [
     path: "/add-cart",
     route: cartRouter,
   },
+  {
+    path: "/order",
+    route: orderRouter,
+  },
+  {
+    path: "/payment",
+    route: paymentRouter,
+  }
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

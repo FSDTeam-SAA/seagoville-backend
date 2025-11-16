@@ -40,6 +40,11 @@ const CouponSchema = new Schema<ICoupon>(
       default: 0,
       min: 0,
     },
+    discountAmount: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
   },
   {
     timestamps: true,

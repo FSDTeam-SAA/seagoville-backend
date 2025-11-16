@@ -7,4 +7,5 @@ export interface ICoupon {
   endDate: Date;
   isActive: boolean;
   timesUsed: number;
+  discountAmount: string | number;
 }
