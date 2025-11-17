@@ -34,7 +34,6 @@ const createNewTopping = async (payload: ITopping, file: any) => {
 const getAllToppings = async (category?: string, toppingCategory?: string) => {
   const mainCategories = ["size", "crust", "sauce", "cheese"];
 
-  // CASE-1 → Filtering by main category
   if (category && category !== "toppings") {
     if (mainCategories.includes(category)) {
       return {
@@ -46,7 +45,6 @@ const getAllToppings = async (category?: string, toppingCategory?: string) => {
       };
     }
 
-    // Filter only specific topping category (Veg / Non-Veg / Spicy)
     return {
       categories: [category],
       data: await Toppings.find({
@@ -62,10 +60,7 @@ const getAllToppings = async (category?: string, toppingCategory?: string) => {
     category: { $nin: mainCategories },
   });
 
-  // Collect unique topping categories
   const categories = [...new Set(data.map((item) => item.category))];
-
-  // CASE-2a → Second-level filter by toppingCategory
   if (toppingCategory) {
     data = data.filter((item) => item.category === toppingCategory);
   }

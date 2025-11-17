@@ -40,7 +40,6 @@ const createPayment = async (
 const confirmPayment = async (payload: { transactionId: string }) => {
   const { transactionId } = payload;
 
-  // 1️⃣ Retrieve payment intent from Stripe
   const paymentIntent = await stripe.paymentIntents.retrieve(transactionId);
 
   // 2️⃣ Determine status
@@ -66,10 +65,42 @@ const confirmPayment = async (payload: { transactionId: string }) => {
   };
 };
 
+const getAllPayments = async (page: number, limit: number, status?: string) => {
+  const skip = (page - 1) * limit;
+
+  // Build filter object
+  const filter: Record<string, any> = {};
+  if (
+    status &&
+    ["pending", "success", "failed"].includes(status.toLowerCase())
+  ) {
+    filter.status = status.toLowerCase();
+  }
+
+  // Get total count
+  const total = await Payment.countDocuments(filter);
+
+  // Fetch paginated data
+  const data = await Payment.find(filter)
+    .populate("orderId")
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    total,
+    totalPages,
+    data,
+  };
+};
+
 
 const paymentService = {
   createPayment,
   confirmPayment,
+  getAllPayments,
 };
 
 export default paymentService;
