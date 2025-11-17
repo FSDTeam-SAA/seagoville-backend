@@ -12,4 +12,5 @@ export interface IMenu {
     large: number;
   };
   isAvailable: boolean;
+  totalSold: number;
 }

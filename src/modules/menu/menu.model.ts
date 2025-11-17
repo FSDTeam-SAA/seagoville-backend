@@ -44,6 +44,10 @@ const menuSchema = new Schema<IMenu>(
       type: Boolean,
       default: true,
     },
+    totalSold: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

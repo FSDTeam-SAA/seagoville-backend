@@ -1,4 +1,5 @@
 import { Coupon } from "../coupons/coupons.model";
+import { Menu } from "../menu/menu.model";
 import Order from "../order/order.model";
 import Payment from "../payment/payment.model";
 import review from "../review/review.model";
@@ -223,7 +224,15 @@ const dashboardChart = async (year: number) => {
   return fullYear;
 };
 
+const popularPizzas = async () => {
+  const topMenus = await Menu.find({ isAvailable: true })
+    .sort({ totalSold: -1 })
+    .limit(5)
+    .select("name totalSold")
+    .lean();
 
+  return topMenus;
+};
 
 const analysisService = {
   toppingsAnalysis,
@@ -232,6 +241,7 @@ const analysisService = {
   paymentAnalysis,
   getDashboardAnalysis,
   dashboardChart,
+  popularPizzas,
 };
 
 export default analysisService;

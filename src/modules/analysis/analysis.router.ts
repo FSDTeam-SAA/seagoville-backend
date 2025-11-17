@@ -12,5 +12,7 @@ router.get("/dashboard", analysisController.getDashboardAnalysis);
 
 router.get("/dashboard-chart", analysisController.dashboardChart);
 
+router.get("/popular-pizzas", analysisController.popularPizzas);
+
 const analysisRouter = router;
 export default analysisRouter;

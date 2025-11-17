@@ -75,6 +75,17 @@ const dashboardChart = catchAsync(async (req, res) => {
   });
 });
 
+const popularPizzas = catchAsync(async (req, res) => {
+  const result = await analysisService.popularPizzas();
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Popular pizzas fetched successfully",
+    data: result,
+  });
+});
+
 const analysisController = {
   toppingsAnalysis,
   getReviewAnalysis,
@@ -82,6 +93,7 @@ const analysisController = {
   paymentAnalysis,
   getDashboardAnalysis,
   dashboardChart,
+  popularPizzas,
 };
 
 export default analysisController;
