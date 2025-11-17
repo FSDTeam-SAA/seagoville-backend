@@ -33,9 +33,53 @@ const getMyOrders = catchAsync(async (req, res) => {
   });
 });
 
+const getAllOrders = catchAsync(async (req, res) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+
+  const result = await orderService.getAllOrders(page, limit);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Orders fetched successfully",
+    data: result.data,
+    meta: result.meta,
+  });
+});
+
+const getSingleOrder = catchAsync(async (req, res) => {
+  const { orderId } = req.params;
+  const result = await orderService.getSingleOrder(orderId);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Order fetched successfully",
+    data: result,
+  });
+});
+
+const toggleOrderStatus = catchAsync(async (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  const result = await orderService.toggleOrderStatus(orderId, status);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Order status toggled successfully",
+    data: result,
+  });
+});
+
 const orderController = {
   createOrder,
   getMyOrders,
+  getAllOrders,
+  getSingleOrder,
+  toggleOrderStatus,
 };
 
 export default orderController;

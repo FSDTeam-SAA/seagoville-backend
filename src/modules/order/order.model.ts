@@ -34,6 +34,11 @@ const OrderSchema = new Schema<IOrder>(
       type: Number,
       min: 0,
     },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
     deliveryDetails: {
       fullName: { type: String, required: true },
       email: { type: String, required: true },

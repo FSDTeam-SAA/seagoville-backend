@@ -98,9 +98,55 @@ const getMyOrders = async () => {
   return orders;
 };
 
+const getAllOrders = async (page: number, limit: number) => {
+  const skip = (page - 1) * limit;
+
+  const total = await Order.countDocuments();
+
+  const orders = await Order.find({})
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 })
+    .lean();
+
+  return {
+    data: orders,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
+const getSingleOrder = async (orderId: string) => {
+  const order = await Order.findById(orderId).lean();
+  return order;
+};
+
+//! ar time a ekta mail jabe
+const toggleOrderStatus = async (orderId: string, status: string) => {
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new AppError("Order not found", StatusCodes.NOT_FOUND);
+  }
+
+  const updatedOrder = await Order.findByIdAndUpdate(
+    orderId,
+    { status },
+    { new: true }
+  );
+
+  return updatedOrder;
+};
+
 const orderService = {
   createOrder,
   getMyOrders,
+  getAllOrders,
+  getSingleOrder,
+  toggleOrderStatus,
 };
 
 export default orderService;
