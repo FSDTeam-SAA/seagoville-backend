@@ -4,7 +4,6 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import Notification from "./notification.model";
 
-
 export const markAllAsRead = catchAsync(async (req: Request, res: Response) => {
   const result = await Notification.updateMany(
     { isViewed: false },
@@ -46,4 +45,3 @@ export const getAllNotifications = catchAsync(
     });
   }
 );
-

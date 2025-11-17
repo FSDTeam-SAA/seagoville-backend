@@ -21,4 +21,6 @@ export interface IOrder {
     phone: string;
     note: string;
   };
+  createdAt: Date;
+  updatedAt: Date;
 }

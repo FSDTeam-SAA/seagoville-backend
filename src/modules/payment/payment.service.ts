@@ -2,7 +2,9 @@ import { StatusCodes } from "http-status-codes";
 import Stripe from "stripe";
 import config from "../../config";
 import AppError from "../../errors/AppError";
+import Notification from "../notification/notification.model";
 import Order from "../order/order.model";
+import { User } from "../user/user.model";
 import Payment from "./payment.model";
 
 const stripe = new Stripe(config.stripe.secretKey as string);
@@ -37,7 +39,7 @@ const createPayment = async (
   };
 };
 
-const confirmPayment = async (payload: { transactionId: string }) => {
+const confirmPayment = async (payload: { transactionId: string }, io: any) => {
   const { transactionId } = payload;
 
   const paymentIntent = await stripe.paymentIntents.retrieve(transactionId);
@@ -55,6 +57,26 @@ const confirmPayment = async (payload: { transactionId: string }) => {
 
   if (!updatedPayment) {
     throw new AppError("Payment not found", StatusCodes.NOT_FOUND);
+  }
+
+  if (status === "success") {
+    const adminUsers = await User.find({ role: "admin" }).lean();
+    if (adminUsers?.length) {
+      for (const admin of adminUsers) {
+        if (!admin._id) continue;
+        try {
+          const notify = await Notification.create({
+            to: admin._id,
+            message: `Payment success for order ${updatedPayment.orderId}`,
+            type: "order",
+            id: updatedPayment._id,
+          });
+          io.to(`${admin._id}`).emit("newNotification", notify);
+        } catch (err) {
+          console.error("Notification error for admin", admin._id, err);
+        }
+      }
+    }
   }
 
   return {
@@ -95,7 +117,6 @@ const getAllPayments = async (page: number, limit: number, status?: string) => {
     data,
   };
 };
-
 
 const paymentService = {
   createPayment,

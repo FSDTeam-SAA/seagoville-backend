@@ -11,8 +11,9 @@ const createOrder = catchAsync(async (req, res) => {
       : Array.isArray(forwardedFor)
       ? forwardedFor[0]
       : req.ip || "unknown";
+  const io = req.app.get("io");
 
-  const result = await orderService.createOrder(req.body, deviceIp);
+  const result = await orderService.createOrder(req.body, deviceIp, io);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

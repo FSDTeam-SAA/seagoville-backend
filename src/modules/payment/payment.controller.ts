@@ -23,12 +23,15 @@ const createPayment = catchAsync(async (req, res) => {
 });
 
 const confirmPayment = catchAsync(async (req, res) => {
-  const result = await paymentService.confirmPayment(req.body);
+  const io = req.app.get("io");
+  const result = await paymentService.confirmPayment(req.body, io);
 
   const message =
     result.status === "success"
       ? "Payment confirmed successfully"
       : "Payment failed";
+
+
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

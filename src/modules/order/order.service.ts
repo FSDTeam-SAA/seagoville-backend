@@ -4,10 +4,12 @@ import AppError from "../../errors/AppError";
 import Cart from "../cart/cart.model";
 import { Coupon } from "../coupons/coupons.model";
 import { Menu } from "../menu/menu.model";
+import Notification from "../notification/notification.model";
+import { User } from "../user/user.model";
 import { IOrder } from "./order.interface";
 import Order from "./order.model";
 
-const createOrder = async (payload: IOrder, deviceIp: string) => {
+const createOrder = async (payload: IOrder, deviceIp: string, io: any) => {
   const { type, productId, size, cart, couponCode, deliveryDetails } = payload;
   let orderCart = [];
   let totalPrice = 0;
@@ -88,6 +90,24 @@ const createOrder = async (payload: IOrder, deviceIp: string) => {
     });
   }
 
+  const adminUsers = await User.find({ role: "admin" }).lean();
+  if (adminUsers?.length) {
+    for (const admin of adminUsers) {
+      if (!admin._id) continue;
+      try {
+        const notify = await Notification.create({
+          to: admin._id,
+          message: "New order created",
+          type: "order",
+          id: newOrder._id,
+        });
+        io.to(`${admin._id}`).emit("newNotification", notify);
+      } catch (err) {
+        console.error("Notification error for admin", admin._id, err);
+      }
+    }
+  }
+
   return newOrder;
 };
 
@@ -146,35 +166,26 @@ const toggleOrderStatus = async (orderId: string, status: string) => {
 };
 
 const getCustomers = async () => {
-  const customers = await Order.aggregate([
-    {
-      $group: {
-        _id: "$deliveryDetails.email", // group by email
-        fullName: { $first: "$deliveryDetails.fullName" },
-        phone: { $first: "$deliveryDetails.phone" },
-        address: { $first: "$deliveryDetails.address" },
-        // totalOrders: { $sum: 1 },
-        totalSpent: { $sum: "$finalPrice" },
-        orderStatus: { $addToSet: "$status" }, // array of distinct statuses
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        email: "$_id",
-        fullName: 1,
-        phone: 1,
-        address: 1,
-        // totalOrders: 1,
-        totalSpent: 1,
-        orderStatus: 1,
-      },
-    },
-    { $sort: { totalOrders: -1 } },
-  ]);
+  const orders = await Order.find({})
+    .sort({ createdAt: -1 }) // newest orders first
+    .select("deliveryDetails finalPrice status createdAt") // fields you want
 
-  return customers;
+
+  // map to include email in top level
+  const result = orders.map((o) => ({
+    fullName: o.deliveryDetails.fullName,
+    email: o.deliveryDetails.email,
+    phone: o.deliveryDetails.phone,
+    address: o.deliveryDetails.address,
+    totalSpent: o.finalPrice,
+    orderStatus: o.status,
+    orderCreatedAt: o.createdAt,
+  }));
+
+  return result;
 };
+
+
 
 const orderService = {
   createOrder,

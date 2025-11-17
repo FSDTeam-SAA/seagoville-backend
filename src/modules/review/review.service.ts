@@ -13,7 +13,7 @@ const createReview = async (payload: IReview, io: any) => {
       try {
         const notify = await Notification.create({
           to: admin._id,
-          message: "New review added",
+          message: `New review added by ${result.name}`,
           type: "review",
           id: result._id,
         });
