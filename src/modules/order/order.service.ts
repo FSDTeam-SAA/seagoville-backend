@@ -165,13 +165,19 @@ const toggleOrderStatus = async (orderId: string, status: string) => {
   return updatedOrder;
 };
 
-const getCustomers = async () => {
+const getCustomers = async (page: number, limit: number) => {
+  const skip = (page - 1) * limit;
+
+  // Count total orders
+  const total = await Order.countDocuments();
+
   const orders = await Order.find({})
-    .sort({ createdAt: -1 }) // newest orders first
-    .select("deliveryDetails finalPrice status createdAt") // fields you want
+    .sort({ createdAt: -1 })
+    .select("deliveryDetails finalPrice status createdAt")
+    .skip(skip)
+    .limit(limit)
+    .lean();
 
-
-  // map to include email in top level
   const result = orders.map((o) => ({
     fullName: o.deliveryDetails.fullName,
     email: o.deliveryDetails.email,
@@ -182,8 +188,17 @@ const getCustomers = async () => {
     orderCreatedAt: o.createdAt,
   }));
 
-  return result;
+  return {
+    data: result,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
+
 
 
 

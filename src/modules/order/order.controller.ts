@@ -77,15 +77,20 @@ const toggleOrderStatus = catchAsync(async (req, res) => {
 });
 
 const getCustomers = catchAsync(async (req, res) => {
-  const result = await orderService.getCustomers();
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+
+  const result = await orderService.getCustomers(page, limit);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
     message: "Customers fetched successfully",
-    data: result,
+    meta: result.meta,
+    data: result.data,
   });
 });
+
 
 const orderController = {
   createOrder,
