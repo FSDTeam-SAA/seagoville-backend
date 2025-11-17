@@ -59,6 +59,19 @@ const getSingleReview = catchAsync(async (req, res) => {
   });
 });
 
+const toggleReviewStatus = catchAsync(async (req, res) => {
+  const { reviewId } = req.params;
+  const { status } = req.body;
+  const result = await reviewService.toggleReviewStatus(reviewId, status);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Review status toggled successfully",
+    data: result,
+  });
+});
+
 const deleteReview = catchAsync(async (req, res) => {
   const { reviewId } = req.params;
   await reviewService.deleteReview(reviewId);
@@ -75,6 +88,7 @@ const reviewController = {
   getAllReviews,
   getApprovedReviews,
   getSingleReview,
+  toggleReviewStatus,
   deleteReview,
 };
 

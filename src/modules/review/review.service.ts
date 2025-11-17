@@ -86,6 +86,20 @@ const getSingleReview = async (id: string) => {
   return result;
 };
 
+const toggleReviewStatus = async (id: string, status: string) => {
+  const isReviewExist = await review.findById(id);
+  if (!isReviewExist) {
+    throw new Error("Review not found");
+  }
+
+  const result = await review.findOneAndUpdate(
+    { _id: id },
+    { status },
+    { new: true }
+  );
+  return result;
+};
+
 const deleteReview = async (id: string) => {
   const isReviewExist = await review.findById(id);
   if (!isReviewExist) {
@@ -100,6 +114,7 @@ const reviewService = {
   getAllReviews,
   getApprovedReviews,
   getSingleReview,
+  toggleReviewStatus,
   deleteReview,
 };
 
