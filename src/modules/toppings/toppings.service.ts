@@ -31,10 +31,53 @@ const createNewTopping = async (payload: ITopping, file: any) => {
   return newTopping;
 };
 
-const getAllToppings = async () => {
-  const toppings = await Toppings.find({ isAvailable: true });
-  return toppings;
+const getAllToppings = async (category?: string, toppingCategory?: string) => {
+  const mainCategories = ["size", "crust", "sauce", "cheese"];
+
+  // CASE-1 → Filtering by main category
+  if (category && category !== "toppings") {
+    if (mainCategories.includes(category)) {
+      return {
+        categories: [],
+        data: await Toppings.find({
+          isAvailable: true,
+          category: category,
+        }),
+      };
+    }
+
+    // Filter only specific topping category (Veg / Non-Veg / Spicy)
+    return {
+      categories: [category],
+      data: await Toppings.find({
+        isAvailable: true,
+        category: category,
+      }),
+    };
+  }
+
+  // CASE-2 → Filtering by "toppings"
+  let data = await Toppings.find({
+    isAvailable: true,
+    category: { $nin: mainCategories },
+  });
+
+  // Collect unique topping categories
+  const categories = [...new Set(data.map((item) => item.category))];
+
+  // CASE-2a → Second-level filter by toppingCategory
+  if (toppingCategory) {
+    data = data.filter((item) => item.category === toppingCategory);
+  }
+
+  return {
+    categories,
+    data,
+  };
 };
+
+
+
 
 const getAllToppingsForAdmin = async (
   page = 1,

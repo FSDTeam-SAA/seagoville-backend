@@ -111,14 +111,23 @@ const getAllMenusForAdmin = async (query: {
 };
 
 const getMenuById = async (menuId: string) => {
-  const isMenuExist = await Menu.findById(menuId);
-  if (!isMenuExist) {
+  const menu = await Menu.findById(menuId);
+
+  if (!menu) {
     throw new AppError("Menu not found", StatusCodes.NOT_FOUND);
   }
 
-  const result = await Menu.findById(menuId);
-  return result;
+  const similarMenus = await Menu.find({
+    category: menu.category,
+    _id: { $ne: menuId },
+  }).limit(5);
+
+  return {
+    menu,
+    similarMenus,
+  };
 };
+
 
 const updateMenu = async (menuId: string, payload: IMenu, files: any) => {
   const isMenuExist = await Menu.findById(menuId);

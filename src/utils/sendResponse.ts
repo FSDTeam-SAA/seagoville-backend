@@ -15,6 +15,7 @@ type TResponse<T> = {
   meta?: TMeta;
   allCategories?: any;
   reviewCount?: number;
+  similar?: any;
 };
 
 const sendResponse = <T>(res: Response, data: TResponse<T>) => {
@@ -26,6 +27,7 @@ const sendResponse = <T>(res: Response, data: TResponse<T>) => {
     meta: data?.meta,
     allCategories: data?.allCategories,
     reviewCount: data?.reviewCount,
+    similar: data?.similar,
   });
 };
 

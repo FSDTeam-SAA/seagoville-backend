@@ -15,7 +15,12 @@ const createNewTopping = catchAsync(async (req, res) => {
 });
 
 const getAllToppings = catchAsync(async (req, res) => {
-  const result = await toppingsService.getAllToppings();
+  const { category, toppingCategory } = req.query;
+
+  const result = await toppingsService.getAllToppings(
+    category as string,
+    toppingCategory as string
+  );
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

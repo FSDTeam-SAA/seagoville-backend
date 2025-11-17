@@ -5,6 +5,8 @@ import menuService from "./menu.service";
 
 const createMenu = catchAsync(async (req, res) => {
   const files: any = req.files;
+  console.log(files);
+
   const result = await menuService.createMenu(req.body, files);
 
   sendResponse(res, {
@@ -59,9 +61,11 @@ const getMenuById = catchAsync(async (req, res) => {
     statusCode: StatusCodes.OK,
     success: true,
     message: "Menu fetched successfully",
-    data: result,
+    data: result.menu,
+    similar: result.similarMenus,
   });
 });
+
 
 const updateMenu = catchAsync(async (req, res) => {
   const { menuId } = req.params;
