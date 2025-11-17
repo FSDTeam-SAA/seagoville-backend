@@ -149,7 +149,7 @@ const getCustomers = async () => {
         fullName: { $first: "$deliveryDetails.fullName" },
         phone: { $first: "$deliveryDetails.phone" },
         address: { $first: "$deliveryDetails.address" },
-        totalOrders: { $sum: 1 },
+        // totalOrders: { $sum: 1 },
         totalSpent: { $sum: "$finalPrice" },
         orderStatus: { $addToSet: "$status" }, // array of distinct statuses
       },
@@ -161,12 +161,12 @@ const getCustomers = async () => {
         fullName: 1,
         phone: 1,
         address: 1,
-        totalOrders: 1,
+        // totalOrders: 1,
         totalSpent: 1,
         orderStatus: 1,
       },
     },
-    { $sort: { totalOrders: -1 } }, // most orders first
+    { $sort: { totalOrders: -1 } },
   ]);
 
   return customers;
