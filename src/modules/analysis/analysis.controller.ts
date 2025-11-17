@@ -58,12 +58,30 @@ const getDashboardAnalysis = catchAsync(async (req, res) => {
   });
 });
 
+const dashboardChart = catchAsync(async (req, res) => {
+  // Get year from query or default to current year
+  let year = Number(req.query.year);
+  if (isNaN(year)) {
+    year = new Date().getFullYear();
+  }
+
+  const result = await analysisService.dashboardChart(year);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Dashboard chart fetched successfully",
+    data: result,
+  });
+});
+
 const analysisController = {
   toppingsAnalysis,
   getReviewAnalysis,
   couponsAnalysis,
   paymentAnalysis,
   getDashboardAnalysis,
+  dashboardChart,
 };
 
 export default analysisController;

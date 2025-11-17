@@ -9,7 +9,7 @@ export interface IOrder {
   }[];
   couponCode: string;
   finalPrice: number;
-  status: "pending" | "delivered" | "cancelled";
+  status: "pending" | "delivered" | "cancelled" 
   deliveryDetails: {
     fullName: string;
     email: string;

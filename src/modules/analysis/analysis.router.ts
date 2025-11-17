@@ -10,5 +10,7 @@ router.get("/payments", analysisController.paymentAnalysis);
 
 router.get("/dashboard", analysisController.getDashboardAnalysis);
 
+router.get("/dashboard-chart", analysisController.dashboardChart);
+
 const analysisRouter = router;
 export default analysisRouter;

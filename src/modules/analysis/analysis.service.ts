@@ -179,12 +179,59 @@ const getDashboardAnalysis = async () => {
   };
 };
 
+const dashboardChart = async (year: number) => {
+  // Start of year (UTC) to include all months properly
+  const startOfYear = new Date(Date.UTC(year, 0, 1, 0, 0, 0));
+  const endOfYear = new Date(Date.UTC(year + 1, 0, 1, 0, 0, 0));
+
+  const rawData = await Payment.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: startOfYear, $lt: endOfYear },
+        status: "success",
+      },
+    },
+    {
+      $group: {
+        _id: { month: { $month: "$createdAt" } },
+        totalSales: { $sum: "$amount" },
+        totalOrders: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        month: "$_id.month",
+        totalSales: 1,
+        totalOrders: 1,
+      },
+    },
+    { $sort: { month: 1 } },
+  ]);
+
+  // Fill missing months
+  const fullYear = Array.from({ length: 12 }, (_, i) => {
+    const month = i + 1;
+    const found = rawData.find((m) => m.month === month);
+    return {
+      month,
+      totalSales: found ? found.totalSales : 0,
+      totalOrders: found ? found.totalOrders : 0,
+    };
+  });
+
+  return fullYear;
+};
+
+
+
 const analysisService = {
   toppingsAnalysis,
   getReviewAnalysis,
   couponsAnalysis,
   paymentAnalysis,
   getDashboardAnalysis,
+  dashboardChart,
 };
 
 export default analysisService;
