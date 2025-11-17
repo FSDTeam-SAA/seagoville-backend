@@ -141,12 +141,44 @@ const toggleOrderStatus = async (orderId: string, status: string) => {
   return updatedOrder;
 };
 
+const getCustomers = async () => {
+  const customers = await Order.aggregate([
+    {
+      $group: {
+        _id: "$deliveryDetails.email", // group by email
+        fullName: { $first: "$deliveryDetails.fullName" },
+        phone: { $first: "$deliveryDetails.phone" },
+        address: { $first: "$deliveryDetails.address" },
+        totalOrders: { $sum: 1 },
+        totalSpent: { $sum: "$finalPrice" },
+        orderStatus: { $addToSet: "$status" }, // array of distinct statuses
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        email: "$_id",
+        fullName: 1,
+        phone: 1,
+        address: 1,
+        totalOrders: 1,
+        totalSpent: 1,
+        orderStatus: 1,
+      },
+    },
+    { $sort: { totalOrders: -1 } }, // most orders first
+  ]);
+
+  return customers;
+};
+
 const orderService = {
   createOrder,
   getMyOrders,
   getAllOrders,
   getSingleOrder,
   toggleOrderStatus,
+  getCustomers,
 };
 
 export default orderService;

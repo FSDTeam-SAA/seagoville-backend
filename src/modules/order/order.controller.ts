@@ -74,12 +74,24 @@ const toggleOrderStatus = catchAsync(async (req, res) => {
   });
 });
 
+const getCustomers = catchAsync(async (req, res) => {
+  const result = await orderService.getCustomers();
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Customers fetched successfully",
+    data: result,
+  });
+});
+
 const orderController = {
   createOrder,
   getMyOrders,
   getAllOrders,
   getSingleOrder,
   toggleOrderStatus,
+  getCustomers,
 };
 
 export default orderController;

@@ -7,7 +7,9 @@ router.post("/new-order", orderController.createOrder);
 router.get("/", orderController.getMyOrders);
 
 router.get("/all-orders", orderController.getAllOrders);
+router.get("/customers", orderController.getCustomers);
 router.get("/:orderId", orderController.getSingleOrder);
+
 router.put("/toggle-status/:orderId", orderController.toggleOrderStatus);
 
 const orderRouter = router;
