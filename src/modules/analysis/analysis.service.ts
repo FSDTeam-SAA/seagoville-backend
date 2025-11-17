@@ -1,4 +1,5 @@
 import { Coupon } from "../coupons/coupons.model";
+import Payment from "../payment/payment.model";
 import review from "../review/review.model";
 import Toppings from "../toppings/toppings.model";
 
@@ -69,10 +70,35 @@ const couponsAnalysis = async () => {
   };
 };
 
+const paymentAnalysis = async () => {
+  const totalRevenueAgg = await Payment.aggregate([
+    {
+      $match: { status: "success" }, 
+    },
+    {
+      $group: {
+        _id: null,
+        totalRevenue: { $sum: "$amount" },
+      },
+    },
+  ]);
+
+  const totalRevenue = totalRevenueAgg[0]?.totalRevenue || 0;
+
+  const totalTransactions = await Payment.countDocuments({ status: "success" });
+
+  return {
+    totalRevenue,
+    totalTransactions,
+  };
+};
+
+
 const analysisService = {
   toppingsAnalysis,
   getReviewAnalysis,
   couponsAnalysis,
+  paymentAnalysis,
 };
 
 export default analysisService;

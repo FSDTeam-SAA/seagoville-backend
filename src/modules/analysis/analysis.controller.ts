@@ -36,10 +36,22 @@ const couponsAnalysis = catchAsync(async (req, res) => {
   });
 });
 
+const paymentAnalysis = catchAsync(async (req, res) => {
+  const result = await analysisService.paymentAnalysis();
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Payments fetched successfully",
+    data: result,
+  });
+});
+
 const analysisController = {
   toppingsAnalysis,
   getReviewAnalysis,
   couponsAnalysis,
+  paymentAnalysis,
 };
 
 export default analysisController;
