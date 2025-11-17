@@ -96,12 +96,18 @@ const getMyOrders = async () => {
   return orders;
 };
 
-const getAllOrders = async (page: number, limit: number) => {
+const getAllOrders = async (page: number, limit: number, status?: string) => {
   const skip = (page - 1) * limit;
 
-  const total = await Order.countDocuments();
+  // Build filter object
+  const filter: any = {};
+  if (status && ["pending", "rejected", "delivered"].includes(status)) {
+    filter.status = status;
+  }
 
-  const orders = await Order.find({})
+  const total = await Order.countDocuments(filter);
+
+  const orders = await Order.find(filter)
     .skip(skip)
     .limit(limit)
     .sort({ createdAt: -1 })
@@ -180,90 +186,3 @@ const orderService = {
 };
 
 export default orderService;
-
-// const createOrder = async (payload: IOrder, deviceIp: string) => {
-//   const { cart, couponCode, deliveryDetails, type } = payload;
-
-//   // 1️⃣ Fetch cart items from DB to ensure totalPrice & quantity are correct
-//   const cartIds = cart.map((c) => c.cartId);
-//   const dbCartItems = await Cart.find({
-//     _id: { $in: cartIds },
-//     deviceIp,
-//   }).lean();
-
-//   if (dbCartItems.length !== cart.length) {
-//     throw new AppError("Some cart items not found", StatusCodes.BAD_REQUEST);
-//   }
-
-//   // 2️⃣ Validate totalPrice for each cart item
-//   dbCartItems.forEach((item) => {
-//     if (typeof item.totalPrice !== "number" || isNaN(item.totalPrice)) {
-//       throw new AppError(
-//         `Cart item ${item._id} has invalid totalPrice`,
-//         StatusCodes.BAD_REQUEST
-//       );
-//     }
-//   });
-
-//   // 3️⃣ Calculate totalCartPrice
-//   let totalCartPrice = dbCartItems.reduce(
-//     (sum, item) => sum + item.totalPrice,
-//     0
-//   );
-
-//   // 4️⃣ Coupon validation and discount calculation
-//   let discountAmount = 0;
-//   let coupon = null;
-
-//   if (couponCode) {
-//     coupon = await Coupon.findOne({ code: couponCode }).lean();
-
-//     if (!coupon) throw new AppError("Invalid coupon", StatusCodes.BAD_REQUEST);
-//     if (!coupon.isActive)
-//       throw new AppError("Coupon inactive", StatusCodes.BAD_REQUEST);
-
-//     const now = new Date();
-//     if (now < coupon.startDate || now > coupon.endDate) {
-//       throw new AppError("Coupon expired", StatusCodes.BAD_REQUEST);
-//     }
-
-//     const rawDiscount = coupon.discountAmount; // "25%" or "50"
-
-//     if (typeof rawDiscount === "string" && rawDiscount.includes("%")) {
-//       const percentage = Number(rawDiscount.replace("%", ""));
-//       discountAmount = (totalCartPrice * percentage) / 100;
-//     } else {
-//       discountAmount = Number(rawDiscount); // Flat discount
-//     }
-//   }
-
-//   // 5️⃣ Calculate finalPrice
-//   const finalPrice = totalCartPrice - discountAmount;
-//   if (finalPrice < 0) throw new AppError("Final price calculation failed", 400);
-
-//   // 6️⃣ Create order
-//   const newOrder = await Order.create({
-//     deviceIp,
-//     cart: dbCartItems.map((c) => ({
-//       cartId: c._id,
-//       quantity: c.quantity,
-//       totalPrice: c.totalPrice,
-//     })),
-//     couponCode: couponCode || "",
-//     finalPrice,
-//     deliveryDetails,
-//   });
-
-//   // 7️⃣ Increment coupon usage
-//   if (coupon) {
-//     await Coupon.findOneAndUpdate(
-//       { _id: coupon._id },
-//       { $inc: { timesUsed: 1 } }
-//     );
-//   }
-
-//   // 8️⃣ Clear cart
-//   await Cart.deleteMany({ _id: { $in: cartIds }, deviceIp });
-
-//   return newOrder;
-// };
