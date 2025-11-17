@@ -1,4 +1,5 @@
 import { Coupon } from "../coupons/coupons.model";
+import Order from "../order/order.model";
 import Payment from "../payment/payment.model";
 import review from "../review/review.model";
 import Toppings from "../toppings/toppings.model";
@@ -73,7 +74,7 @@ const couponsAnalysis = async () => {
 const paymentAnalysis = async () => {
   const totalRevenueAgg = await Payment.aggregate([
     {
-      $match: { status: "success" }, 
+      $match: { status: "success" },
     },
     {
       $group: {
@@ -93,12 +94,97 @@ const paymentAnalysis = async () => {
   };
 };
 
+const getDashboardAnalysis = async () => {
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999);
+
+  // Get total orders for today
+  const totalOrders = await Order.countDocuments();
+
+  // Get total sales for today
+  const todaySalesAgg = await Order.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: startOfToday, $lt: endOfToday },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalSales: { $sum: "$finalPrice" },
+      },
+    },
+  ]);
+  const todaySales = todaySalesAgg[0]?.totalSales || 0;
+
+  // Get pending orders
+  const pendingOrders = await Order.countDocuments({ status: "pending" });
+
+  // Get the data from the previous day for comparison
+  const startOfYesterday = new Date();
+  startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+  startOfYesterday.setHours(0, 0, 0, 0);
+
+  const endOfYesterday = new Date();
+  endOfYesterday.setDate(endOfYesterday.getDate() - 1);
+  endOfYesterday.setHours(23, 59, 59, 999);
+
+  // Get total orders for yesterday
+  const totalOrdersYesterday = await Order.countDocuments({
+    createdAt: { $gte: startOfYesterday, $lt: endOfYesterday },
+  });
+
+  // Get total sales for yesterday
+  const yesterdaySalesAgg = await Order.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: startOfYesterday, $lt: endOfYesterday },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalSales: { $sum: "$finalPrice" },
+      },
+    },
+  ]);
+  const yesterdaySales = yesterdaySalesAgg[0]?.totalSales || 0;
+
+  // Get pending orders from yesterday
+  const pendingOrdersYesterday = await Order.countDocuments({
+    status: "pending",
+  });
+
+  // Calculate percentage changes
+  const totalOrdersChange = totalOrdersYesterday
+    ? ((totalOrders - totalOrdersYesterday) / totalOrdersYesterday) * 100
+    : 0;
+  const salesChange = yesterdaySales
+    ? ((todaySales - yesterdaySales) / yesterdaySales) * 100
+    : 0;
+  const pendingOrdersChange = pendingOrdersYesterday
+    ? ((pendingOrders - pendingOrdersYesterday) / pendingOrdersYesterday) * 100
+    : 0;
+
+  return {
+    totalOrders,
+    totalOrdersPercentChange: totalOrdersChange,
+    todaySales,
+    salesPercent: salesChange,
+    pendingOrders,
+    pendingOrdersPercent: pendingOrdersChange,
+  };
+};
 
 const analysisService = {
   toppingsAnalysis,
   getReviewAnalysis,
   couponsAnalysis,
   paymentAnalysis,
+  getDashboardAnalysis,
 };
 
 export default analysisService;

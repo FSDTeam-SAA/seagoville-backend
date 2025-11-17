@@ -8,5 +8,7 @@ router.get("/reviews", analysisController.getReviewAnalysis);
 router.get("/coupons", analysisController.couponsAnalysis);
 router.get("/payments", analysisController.paymentAnalysis);
 
+router.get("/dashboard", analysisController.getDashboardAnalysis);
+
 const analysisRouter = router;
 export default analysisRouter;

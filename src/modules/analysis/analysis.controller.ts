@@ -47,11 +47,23 @@ const paymentAnalysis = catchAsync(async (req, res) => {
   });
 });
 
+const getDashboardAnalysis = catchAsync(async (req, res) => {
+  const result = await analysisService.getDashboardAnalysis();
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Dashboard fetched successfully",
+    data: result,
+  });
+});
+
 const analysisController = {
   toppingsAnalysis,
   getReviewAnalysis,
   couponsAnalysis,
   paymentAnalysis,
+  getDashboardAnalysis,
 };
 
 export default analysisController;
