@@ -7,6 +7,15 @@ const OrderSchema = new Schema<IOrder>(
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      enum: ["single", "multi"],
+      required: true,
+    },
+    productId: {
+      type: Schema.Types.ObjectId,
+      ref: "Menu",
+    },
     cart: [
       {
         cartId: {
@@ -26,6 +35,10 @@ const OrderSchema = new Schema<IOrder>(
         },
       },
     ],
+    size: {
+      type: String,
+      enum: ["small", "medium", "large"],
+    },
     couponCode: {
       type: String,
       default: "",
