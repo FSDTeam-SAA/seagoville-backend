@@ -4,7 +4,8 @@ import sendResponse from "../../utils/sendResponse";
 import reviewService from "./review.service";
 
 const createReview = catchAsync(async (req, res) => {
-  const result = await reviewService.createReview(req.body);
+  const io = req.app.get("io");
+  const result = await reviewService.createReview(req.body, io);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

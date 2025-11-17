@@ -12,6 +12,7 @@ import reviewRouter from "../modules/review/review.router";
 import subscriptionRouter from "../modules/subscription/subscription.router";
 import toppingsRouter from "../modules/toppings/toppings.router";
 import userRouter from "../modules/user/user.router";
+import notificationRouter from "../modules/notification/notification.route";
 
 const router = Router();
 
@@ -67,7 +68,11 @@ const moduleRoutes = [
   {
     path: "/payment",
     route: paymentRouter,
-  }
+  },
+  {
+    path: "/notifications",
+    route: notificationRouter,
+  },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
