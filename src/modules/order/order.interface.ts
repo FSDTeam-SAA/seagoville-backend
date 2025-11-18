@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 
 export interface IOrder {
+  // _id: Types.ObjectId;
   type: "single" | "multi";
   productId?: string;
   deviceIp: string;

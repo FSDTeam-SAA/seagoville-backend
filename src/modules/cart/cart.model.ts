@@ -10,7 +10,6 @@ const cartModel = new Schema<ICart>(
       },
       types: {
         type: String,
-        required: true,
       },
     },
     ownPizzaId: {
@@ -23,7 +22,7 @@ const cartModel = new Schema<ICart>(
     },
     totalPrice: {
       type: Number,
-      required: true,
+      // required: true,
     },
     deviceIp: {
       type: String,

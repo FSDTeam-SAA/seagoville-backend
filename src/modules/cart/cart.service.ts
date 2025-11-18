@@ -1,50 +1,82 @@
 import { StatusCodes } from "http-status-codes";
 import AppError from "../../errors/AppError";
 import { Menu } from "../menu/menu.model";
+import ownPizza from "../ownPizza/ownPizza.model";
 import { ICart } from "./cart.interface";
 import Cart from "./cart.model";
 
 const menuAddToCart = async (payload: ICart, deviceIp: string) => {
-  const { menu } = payload;
+  const { menu, type, ownPizzaId } = payload;
 
-  // Find the menu by ID
-  const menuItem = await Menu.findById(menu.menuId);
-  if (!menuItem) {
-    throw new AppError("Menu not found", StatusCodes.NOT_FOUND);
+  if (type === "menu") {
+    const menuItem = await Menu.findById(menu.menuId);
+    if (!menuItem) {
+      throw new AppError("Menu not found", StatusCodes.NOT_FOUND);
+    }
+
+    if (!menu.types) {
+      throw new AppError("Menu type is required", StatusCodes.BAD_REQUEST);
+    }
+
+    // Step 2: Check availability
+    if (menuItem.isAvailable === false) {
+      throw new AppError("Menu is not available", StatusCodes.BAD_REQUEST);
+    }
+
+    // Step 3: Make type lowercase (small/medium/large)
+    const selectedType = menu.types.toLowerCase();
+
+    // Step 4: Fetch price
+    const price = menuItem.price[selectedType as keyof typeof menuItem.price];
+
+    if (!price) {
+      throw new AppError(
+        `Price for type ${selectedType} not found`,
+        StatusCodes.BAD_REQUEST
+      );
+    }
+
+    // Step 5: Create Cart Item
+    const quantity = payload.quantity || 1;
+
+    const result = await Cart.create({
+      menu: {
+        menuId: menuItem._id,
+        types: selectedType,
+      },
+      quantity,
+      totalPrice: price * quantity,
+      deviceIp,
+      type: "menu",
+    });
+
+    return result;
   }
 
-  if (menuItem.isAvailable === false) {
-    throw new AppError("Menu is not available", StatusCodes.BAD_REQUEST);
+  if (type === "ownPizza") {
+    const ownPizzaExists = await ownPizza.findById(ownPizzaId);
+    if (!ownPizzaExists) {
+      throw new AppError("Own pizza not found", StatusCodes.NOT_FOUND);
+    }
+
+    const quantity = payload.quantity || 1;
+
+    const result = await Cart.create({
+      ownPizzaId: ownPizzaExists._id,
+      quantity,
+      totalPrice: ownPizzaExists.totalPrice,
+      deviceIp,
+      type: "ownPizza",
+    });
+
+    return result;
   }
 
-  // Get the selected type price
-  const selectedType = menu.types.toLowerCase();
-  const price = menuItem.price[selectedType as keyof typeof menuItem.price];
-
-  if (!price) {
-    throw new AppError(
-      `Price for type ${selectedType} not found`,
-      StatusCodes.BAD_REQUEST
-    );
-  }
-
-  // Create cart item
-  const result = await Cart.create({
-    menu: {
-      menuId: menuItem._id,
-      types: selectedType,
-    },
-    quantity: payload.quantity || 1,
-    totalPrice: price * (payload.quantity || 1),
-    deviceIp,
-    type: "menu",
-  });
-
-  return result;
+  throw new AppError("Invalid cart type", StatusCodes.BAD_REQUEST);
 };
 
 const getCart = async (deviceIp: string) => {
-  const result = await Cart.find({ deviceIp, isDelivered: false })
+  const result = await Cart.find({ deviceIp })
     .select("-__v -createdAt -updatedAt")
     .populate({
       path: "menu.menuId",
@@ -52,12 +84,10 @@ const getCart = async (deviceIp: string) => {
     })
     .populate({
       path: "ownPizzaId",
-      select: "size crust sauce cheese toppings totalPrice", // select fields you want
+      select: "size crust sauce cheese toppings totalPrice isDelivered",
       populate: [
         { path: "size", select: "name price" },
         { path: "crust", select: "name price" },
-        { path: "sauce", select: "name price" },
-        { path: "cheese", select: "name price" },
         { path: "toppings.toppingId", select: "name price category" },
       ],
     });

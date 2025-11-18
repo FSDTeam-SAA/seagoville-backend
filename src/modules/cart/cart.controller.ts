@@ -31,6 +31,8 @@ const getCart = catchAsync(async (req, res) => {
       ? forwardedFor[0]
       : req.ip || "unknown";
 
+  console.log(deviceIp);
+
   const result = await cartService.getCart(deviceIp);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
