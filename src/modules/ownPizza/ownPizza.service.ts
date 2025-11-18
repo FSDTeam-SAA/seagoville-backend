@@ -68,13 +68,13 @@ const createOwnPizza = async (payload: IOwnPizza, deviceIp: string) => {
     deviceIp,
   });
 
-  await Cart.create({
-    type: "ownPizza",
-    totalPrice: price, 
-    ownPizzaId: result._id, 
-    menuId: null,
-    deviceIp, 
-  });
+  // await Cart.create({
+  //   type: "ownPizza",
+  //   totalPrice: price, 
+  //   ownPizzaId: result._id, 
+  //   menuId: null,
+  //   deviceIp, 
+  // });
 
   return result;
 };
