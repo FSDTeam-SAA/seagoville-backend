@@ -25,6 +25,7 @@ const ownPizzaModel = new Schema<IOwnPizza>(
     toppings: [toppingItemSchema],
     totalPrice: { type: Number },
     deviceIp: { type: String },
+    isDelivered: { type: Boolean, default: false },
   },
   {
     timestamps: true,

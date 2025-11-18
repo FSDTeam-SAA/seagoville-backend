@@ -28,10 +28,10 @@ const toppingsAnalysis = async () => {
 };
 
 const getReviewAnalysis = async () => {
-  const totalReviews = await review.countDocuments();
-  const pendingReviews = await review.countDocuments({ status: "pending" });
-  const approvedReview = await review.countDocuments({ status: "approved" });
-  const averageRating = await review
+  const totalReviewsAnalysis = await review.countDocuments();
+  const pendingReviewsAnalysis = await review.countDocuments({ status: "pending" });
+  const approvedReviewAnalysis = await review.countDocuments({ status: "approved" });
+  const averageRatingAnalysis = await review
     .aggregate([
       {
         $group: {
@@ -42,12 +42,12 @@ const getReviewAnalysis = async () => {
     ])
     .then((result) => result[0]?.averageRating || 0);
 
-  return Promise.all([
-    totalReviews,
-    pendingReviews,
-    approvedReview,
-    averageRating,
-  ]);
+  return {
+    totalReviewsAnalysis,
+    pendingReviewsAnalysis,
+    approvedReviewAnalysis,
+    averageRatingAnalysis,
+  };
 };
 
 const couponsAnalysis = async () => {

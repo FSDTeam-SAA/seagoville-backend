@@ -11,4 +11,5 @@ export interface IOwnPizza {
   }[];
   totalPrice: number;
   deviceIp: string;
+  isDelivered?: boolean;
 }

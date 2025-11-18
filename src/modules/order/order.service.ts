@@ -8,6 +8,7 @@ import Notification from "../notification/notification.model";
 import { User } from "../user/user.model";
 import { IOrder } from "./order.interface";
 import Order from "./order.model";
+import ownPizza from "../ownPizza/ownPizza.model";
 
 const createOrder = async (payload: IOrder, deviceIp: string, io: any) => {
   const { type, productId, size, cart, couponCode, deliveryDetails } = payload;
@@ -149,7 +150,8 @@ const getSingleOrder = async (orderId: string) => {
   return order;
 };
 
-//! ar time a ekta mail jabe
+//! when admin toggle then go email to customer-----------------------------------
+//! Also in when user order then go email to admin--------------------------------------------------------------------------
 const toggleOrderStatus = async (orderId: string, status: string) => {
   const order = await Order.findById(orderId);
   if (!order) {
@@ -161,6 +163,16 @@ const toggleOrderStatus = async (orderId: string, status: string) => {
     { status },
     { new: true }
   );
+
+
+  if(status === "delivered"){
+    // await sendOrderDeliveredEmail(order.deliveryDetails.email);
+    await ownPizza.findOneAndUpdate({ _id: order.productId }, { isDelivered: true });
+  }
+
+
+
+
 
   return updatedOrder;
 };
