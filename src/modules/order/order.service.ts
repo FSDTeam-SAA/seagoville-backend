@@ -5,10 +5,10 @@ import Cart from "../cart/cart.model";
 import { Coupon } from "../coupons/coupons.model";
 import { Menu } from "../menu/menu.model";
 import Notification from "../notification/notification.model";
+import ownPizza from "../ownPizza/ownPizza.model";
 import { User } from "../user/user.model";
 import { IOrder } from "./order.interface";
 import Order from "./order.model";
-import ownPizza from "../ownPizza/ownPizza.model";
 
 const createOrder = async (payload: IOrder, deviceIp: string, io: any) => {
   const { type, productId, size, cart, couponCode, deliveryDetails } = payload;
@@ -164,15 +164,14 @@ const toggleOrderStatus = async (orderId: string, status: string) => {
     { new: true }
   );
 
-
-  if(status === "delivered"){
+  //! Not working right now
+  if (status === "delivered") {
     // await sendOrderDeliveredEmail(order.deliveryDetails.email);
-    await ownPizza.findOneAndUpdate({ _id: order.productId }, { isDelivered: true });
+    await ownPizza.findOneAndUpdate(
+      { _id: order.productId },
+      { isDelivered: true }
+    );
   }
-
-
-
-
 
   return updatedOrder;
 };
@@ -210,9 +209,6 @@ const getCustomers = async (page: number, limit: number) => {
     },
   };
 };
-
-
-
 
 const orderService = {
   createOrder,

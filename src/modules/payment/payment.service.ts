@@ -77,6 +77,14 @@ const confirmPayment = async (payload: { transactionId: string }, io: any) => {
         }
       }
     }
+
+    // await sendOrderEmail(updatedPayment.orderId);
+
+    //! Add to logic menuId totalSold field-------------------------------------------------------------------------
+    // await ownPizza.findOneAndUpdate(
+    //   { _id: updatedPayment.orderId },
+    //   { $inc: { totalSold: 1 } }
+    // );
   }
 
   return {

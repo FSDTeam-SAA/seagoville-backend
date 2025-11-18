@@ -44,7 +44,7 @@ const menuAddToCart = async (payload: ICart, deviceIp: string) => {
 };
 
 const getCart = async (deviceIp: string) => {
-  const result = await Cart.find({ deviceIp })
+  const result = await Cart.find({ deviceIp, isDelivered: false })
     .select("-__v -createdAt -updatedAt")
     .populate({
       path: "menu.menuId",
