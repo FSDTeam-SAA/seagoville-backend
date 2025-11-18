@@ -5,11 +5,12 @@ import paymentService from "./payment.service";
 
 const createPayment = catchAsync(async (req, res) => {
   const forwardedFor = req.headers["x-forwarded-for"];
+
   const deviceIp =
     typeof forwardedFor === "string"
-      ? forwardedFor
+      ? forwardedFor.split(",")[0].trim()
       : Array.isArray(forwardedFor)
-      ? forwardedFor[0]
+      ? forwardedFor[0].split(",")[0].trim()
       : req.ip || "unknown";
 
   const result = await paymentService.createPayment(req.body, deviceIp);
@@ -30,8 +31,6 @@ const confirmPayment = catchAsync(async (req, res) => {
     result.status === "success"
       ? "Payment confirmed successfully"
       : "Payment failed";
-
-
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -61,7 +60,6 @@ const getAllPayments = catchAsync(async (req, res) => {
     data: result.data,
   });
 });
-
 
 const paymentController = {
   createPayment,

@@ -5,7 +5,6 @@ import menuService from "./menu.service";
 
 const createMenu = catchAsync(async (req, res) => {
   const files: any = req.files;
-  console.log(files);
 
   const result = await menuService.createMenu(req.body, files);
 

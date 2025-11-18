@@ -5,11 +5,12 @@ import orderService from "./order.service";
 
 const createOrder = catchAsync(async (req, res) => {
   const forwardedFor = req.headers["x-forwarded-for"];
+
   const deviceIp =
     typeof forwardedFor === "string"
-      ? forwardedFor
+      ? forwardedFor.split(",")[0].trim()
       : Array.isArray(forwardedFor)
-      ? forwardedFor[0]
+      ? forwardedFor[0].split(",")[0].trim()
       : req.ip || "unknown";
   const io = req.app.get("io");
 
@@ -90,7 +91,6 @@ const getCustomers = catchAsync(async (req, res) => {
     data: result.data,
   });
 });
-
 
 const orderController = {
   createOrder,

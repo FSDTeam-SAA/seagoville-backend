@@ -4,13 +4,13 @@ import sendResponse from "../../utils/sendResponse";
 import ownPizzaService from "./ownPizza.service";
 
 const createOwnPizza = catchAsync(async (req, res) => {
-  // Normalize the device IP
   const forwardedFor = req.headers["x-forwarded-for"];
+
   const deviceIp =
     typeof forwardedFor === "string"
-      ? forwardedFor
+      ? forwardedFor.split(",")[0].trim()
       : Array.isArray(forwardedFor)
-      ? forwardedFor[0]
+      ? forwardedFor[0].split(",")[0].trim()
       : req.ip || "unknown";
 
   const result = await ownPizzaService.createOwnPizza(req.body, deviceIp);
@@ -24,13 +24,13 @@ const createOwnPizza = catchAsync(async (req, res) => {
 });
 
 const getAllOwnPizzas = catchAsync(async (req, res) => {
-  // Normalize device IP
   const forwardedFor = req.headers["x-forwarded-for"];
+
   const deviceIp =
     typeof forwardedFor === "string"
-      ? forwardedFor
+      ? forwardedFor.split(",")[0].trim()
       : Array.isArray(forwardedFor)
-      ? forwardedFor[0]
+      ? forwardedFor[0].split(",")[0].trim()
       : req.ip || "unknown";
 
   const result = await ownPizzaService.getAllOwnPizzas(deviceIp);
@@ -42,7 +42,6 @@ const getAllOwnPizzas = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
 
 const ownPizzaController = {
   createOwnPizza,

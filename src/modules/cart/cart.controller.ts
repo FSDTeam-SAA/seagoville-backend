@@ -5,11 +5,12 @@ import cartService from "./cart.service";
 
 const menuAddToCart = catchAsync(async (req, res) => {
   const forwardedFor = req.headers["x-forwarded-for"];
+
   const deviceIp =
     typeof forwardedFor === "string"
-      ? forwardedFor
+      ? forwardedFor.split(",")[0].trim()
       : Array.isArray(forwardedFor)
-      ? forwardedFor[0]
+      ? forwardedFor[0].split(",")[0].trim()
       : req.ip || "unknown";
 
   const result = await cartService.menuAddToCart(req.body, deviceIp);
@@ -24,14 +25,13 @@ const menuAddToCart = catchAsync(async (req, res) => {
 
 const getCart = catchAsync(async (req, res) => {
   const forwardedFor = req.headers["x-forwarded-for"];
+
   const deviceIp =
     typeof forwardedFor === "string"
-      ? forwardedFor
+      ? forwardedFor.split(",")[0].trim()
       : Array.isArray(forwardedFor)
-      ? forwardedFor[0]
+      ? forwardedFor[0].split(",")[0].trim()
       : req.ip || "unknown";
-
-  console.log(deviceIp);
 
   const result = await cartService.getCart(deviceIp);
   sendResponse(res, {
@@ -46,11 +46,12 @@ const incrementQuantity = catchAsync(async (req, res) => {
   const { cartId } = req.params;
 
   const forwardedFor = req.headers["x-forwarded-for"];
+
   const deviceIp =
     typeof forwardedFor === "string"
-      ? forwardedFor
+      ? forwardedFor.split(",")[0].trim()
       : Array.isArray(forwardedFor)
-      ? forwardedFor[0]
+      ? forwardedFor[0].split(",")[0].trim()
       : req.ip || "unknown";
 
   const result = await cartService.incrementQuantity(deviceIp, cartId);
@@ -66,11 +67,12 @@ const decrementQuantity = catchAsync(async (req, res) => {
   const { cartId } = req.params;
 
   const forwardedFor = req.headers["x-forwarded-for"];
+
   const deviceIp =
     typeof forwardedFor === "string"
-      ? forwardedFor
+      ? forwardedFor.split(",")[0].trim()
       : Array.isArray(forwardedFor)
-      ? forwardedFor[0]
+      ? forwardedFor[0].split(",")[0].trim()
       : req.ip || "unknown";
 
   const result = await cartService.decrementQuantity(deviceIp, cartId);
@@ -86,11 +88,12 @@ const deleteCart = catchAsync(async (req, res) => {
   const { cartId } = req.params;
 
   const forwardedFor = req.headers["x-forwarded-for"];
+
   const deviceIp =
     typeof forwardedFor === "string"
-      ? forwardedFor
+      ? forwardedFor.split(",")[0].trim()
       : Array.isArray(forwardedFor)
-      ? forwardedFor[0]
+      ? forwardedFor[0].split(",")[0].trim()
       : req.ip || "unknown";
 
   await cartService.deleteCart(deviceIp, cartId);
