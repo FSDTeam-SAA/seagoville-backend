@@ -68,7 +68,6 @@ const confirmPayment = async (payload: { transactionId: string }, io: any) => {
     const order = await Order.findById(updatedPayment.orderId).lean();
     if (!order) throw new AppError("Order not found", 404);
 
-    // 5️⃣ Send admin notifications
     const adminUsers = await User.find({ role: "admin" }).lean();
     if (adminUsers?.length) {
       for (const admin of adminUsers) {
