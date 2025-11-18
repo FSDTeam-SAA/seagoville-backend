@@ -6,6 +6,9 @@ import Notification from "../notification/notification.model";
 import Order from "../order/order.model";
 import { User } from "../user/user.model";
 import Payment from "./payment.model";
+import createOrderTemplate from "../../utils/createOrderTemplate";
+import sendEmail from "../../utils/sendEmail";
+import { Menu } from "../menu/menu.model";
 
 const stripe = new Stripe(config.stripe.secretKey as string);
 
@@ -42,9 +45,10 @@ const createPayment = async (
 const confirmPayment = async (payload: { transactionId: string }, io: any) => {
   const { transactionId } = payload;
 
+  // 1️⃣ Retrieve payment intent from Stripe
   const paymentIntent = await stripe.paymentIntents.retrieve(transactionId);
 
-  // 2️⃣ Determine status
+  // 2️⃣ Determine payment status
   const status: "success" | "failed" =
     paymentIntent.status === "succeeded" ? "success" : "failed";
 
@@ -59,7 +63,12 @@ const confirmPayment = async (payload: { transactionId: string }, io: any) => {
     throw new AppError("Payment not found", StatusCodes.NOT_FOUND);
   }
 
+  // 4️⃣ If payment success, fetch related order
   if (status === "success") {
+    const order = await Order.findById(updatedPayment.orderId).lean();
+    if (!order) throw new AppError("Order not found", 404);
+
+    // 5️⃣ Send admin notifications
     const adminUsers = await User.find({ role: "admin" }).lean();
     if (adminUsers?.length) {
       for (const admin of adminUsers) {
@@ -67,24 +76,36 @@ const confirmPayment = async (payload: { transactionId: string }, io: any) => {
         try {
           const notify = await Notification.create({
             to: admin._id,
-            message: `Payment success for order ${updatedPayment.orderId}`,
+            message: `Payment succeeded for order #${order._id}`,
             type: "order",
             id: updatedPayment._id,
           });
-          io.to(`${admin._id}`).emit("newNotification", notify);
+          io.to(String(admin._id)).emit("newNotification", notify);
         } catch (err) {
           console.error("Notification error for admin", admin._id, err);
         }
       }
     }
 
-    // await sendOrderEmail(updatedPayment.orderId);
+    // 6️⃣ Send email to customer
+    const html = createOrderTemplate({
+      orderId: order._id.toString(),
+      fullName: order.deliveryDetails.fullName,
+      email: order.deliveryDetails.email,
+      phone: order.deliveryDetails.phone,
+      address: order.deliveryDetails.address,
+      note: order.deliveryDetails.note,
+      finalPrice: order.finalPrice,
+      createdAt: order.createdAt,
+    });
 
-    //! Add to logic menuId totalSold field-------------------------------------------------------------------------
-    // await ownPizza.findOneAndUpdate(
-    //   { _id: updatedPayment.orderId },
-    //   { $inc: { totalSold: 1 } }
-    // );
+    await sendEmail({
+      to: order.deliveryDetails.email,
+      subject: "Your payment is successful! 🎉",
+      html,
+    });
+
+    await Menu.findByIdAndUpdate(order.productId, { $inc: { totalSold: 1 } });
   }
 
   return {
@@ -94,6 +115,7 @@ const confirmPayment = async (payload: { transactionId: string }, io: any) => {
     stripeStatus: paymentIntent.status,
   };
 };
+
 
 const getAllPayments = async (page: number, limit: number, status?: string) => {
   const skip = (page - 1) * limit;

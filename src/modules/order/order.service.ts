@@ -1,6 +1,11 @@
 /* eslint-disable prefer-const */
 import { StatusCodes } from "http-status-codes";
+import config from "../../config";
 import AppError from "../../errors/AppError";
+import getStatusSubject from "../../lib/helper";
+import createOrderTemplate from "../../utils/createOrderTemplate";
+import sendEmail from "../../utils/sendEmail";
+import getOrderStatusEmailTemplate from "../../utils/sendOrderUpdate";
 import Cart from "../cart/cart.model";
 import { Coupon } from "../coupons/coupons.model";
 import { Menu } from "../menu/menu.model";
@@ -9,7 +14,6 @@ import ownPizza from "../ownPizza/ownPizza.model";
 import { User } from "../user/user.model";
 import { IOrder } from "./order.interface";
 import Order from "./order.model";
-
 
 const createOrder = async (payload: IOrder, deviceIp: string, io: any) => {
   const session = await Order.startSession();
@@ -169,6 +173,24 @@ const createOrder = async (payload: IOrder, deviceIp: string, io: any) => {
       }
     }
 
+    // 2️⃣ Send email to customer
+    // const html = createOrderTemplate({
+    //   orderId: newOrder[0]._id.toString(),
+    //   fullName: newOrder[0].deliveryDetails.fullName,
+    //   email: newOrder[0].deliveryDetails.email,
+    //   finalPrice: newOrder[0].finalPrice,
+    //   createdAt: newOrder[0].createdAt,
+    //   phone: newOrder[0].deliveryDetails.phone,
+    //   address: newOrder[0].deliveryDetails.address,
+    //   note: newOrder[0].deliveryDetails.note,
+    // });
+
+    // await sendEmail({
+    //   to: config.email.emailAddress as string,
+    //   subject: "New order is created",
+    //   html,
+    // });
+
     await session.commitTransaction();
     session.endSession();
 
@@ -218,12 +240,9 @@ const getSingleOrder = async (orderId: string) => {
   return order;
 };
 
-//! when admin toggle then go email to customer-----------------------------------
-//! Also in when user order then go email to admin--------------------------------------------------------------------------
 const toggleOrderStatus = async (orderId: string, status: string) => {
-  console.log(orderId);
+  const order = await Order.findById(orderId).lean();
 
-  const order = await Order.findById(orderId);
   if (!order) {
     throw new AppError("Order not found", StatusCodes.NOT_FOUND);
   }
@@ -232,16 +251,20 @@ const toggleOrderStatus = async (orderId: string, status: string) => {
     orderId,
     { status },
     { new: true }
+  ).lean();
+
+  const html = getOrderStatusEmailTemplate(
+    updatedOrder!.deliveryDetails.fullName,
+    updatedOrder!.status,
+    updatedOrder!.finalPrice,
+    updatedOrder!.createdAt
   );
 
-  //! Not working right now
-  if (status === "delivered") {
-    // await sendOrderDeliveredEmail(order.deliveryDetails.email);
-    await ownPizza.findOneAndUpdate(
-      { _id: order.productId },
-      { isDelivered: true }
-    );
-  }
+  await sendEmail({
+    to: updatedOrder!.deliveryDetails.email,
+    subject: getStatusSubject(updatedOrder!.status),
+    html,
+  });
 
   return updatedOrder;
 };
