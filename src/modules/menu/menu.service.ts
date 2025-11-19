@@ -167,7 +167,14 @@ const updateMenu = async (menuId: string, payload: IMenu, files: any) => {
 
   const result = await Menu.findOneAndUpdate(
     { _id: menuId },
-    { ...payload, images },
+    {
+      name: payload.name,
+      category: payload.category,
+      description: payload.description,
+      price: payload.price,
+      ingredients: payload.ingredients,
+      images: images, 
+    },
     { new: true }
   );
   return result;

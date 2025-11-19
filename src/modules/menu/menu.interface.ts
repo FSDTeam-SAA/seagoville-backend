@@ -13,4 +13,5 @@ export interface IMenu {
   };
   isAvailable: boolean;
   totalSold: number;
+  ingredients: string[];
 }

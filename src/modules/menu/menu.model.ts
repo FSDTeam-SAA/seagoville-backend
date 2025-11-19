@@ -48,6 +48,10 @@ const menuSchema = new Schema<IMenu>(
       type: Number,
       default: 0,
     },
+    ingredients: {
+      type: [String],
+      required: true,
+    },
   },
   {
     timestamps: true,
