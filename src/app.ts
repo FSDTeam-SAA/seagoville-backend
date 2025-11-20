@@ -1,6 +1,6 @@
-import express, { Application, RequestHandler } from "express";
-import cors from "cors";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import express, { Application, RequestHandler } from "express";
 import globalErrorHandler from "./middleware/globalErrorHandler";
 import notFound from "./middleware/notFound";
 import router from "./router";
@@ -16,9 +16,10 @@ const corsOptions = {
   origin: [
     "http://localhost:3000",
     "http://localhost:3001",
-    "http://localhost:3002",
-    "http://localhost:3003",
     "https://seagoville.vercel.app",
+    "https://pizzacraving.com",
+    "https://www.pizzacraving.com",
+    "https://admin.pizzacraving.com",
   ],
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   credentials: true,
