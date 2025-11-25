@@ -44,7 +44,7 @@ const createOrder = async (payload: IOrder, deviceIp: string, io: any) => {
         size,
       });
 
-      totalPrice = price;
+      // totalPrice = price;
     }
 
     // MULTI ORDER
