@@ -45,7 +45,7 @@ const menuAddToCart = async (payload: ICart, deviceIp: string) => {
         types: selectedType,
       },
       quantity,
-      totalPrice: price * quantity,
+      totalPrice: price,
       deviceIp,
       type: "menu",
     });

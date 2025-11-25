@@ -3,7 +3,9 @@ import { Types } from "mongoose";
 export interface ICart {
   menu: {
     menuId: Types.ObjectId;
-    types: string;
+    price?: number;
+    sizes?: string[];
+    types?: string;
   };
   ownPizzaId: Types.ObjectId;
   quantity: number;

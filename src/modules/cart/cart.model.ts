@@ -1,12 +1,18 @@
-import { model, Schema, Types } from "mongoose";
+import { model, Schema } from "mongoose";
 import { ICart } from "./cart.interface";
 
 const cartModel = new Schema<ICart>(
   {
     menu: {
       menuId: {
-        type: Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Menu",
+      },
+      price: {
+        type: Number,
+      },
+      sizes: {
+        type: [String],
       },
       types: {
         type: String,
