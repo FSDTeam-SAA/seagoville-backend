@@ -23,22 +23,14 @@ const menuSchema = new Schema<IMenu>(
         url: { type: String, required: true },
       },
     ],
+    sizes: {
+      type: [String],
+    },
+    pieces: {
+      type: [Number],
+    },
     price: {
-      small: {
-        type: Number,
-        required: true,
-        min: 0,
-      },
-      medium: {
-        type: Number,
-        required: true,
-        min: 0,
-      },
-      large: {
-        type: Number,
-        required: true,
-        min: 0,
-      },
+      type: [Number],
     },
     isAvailable: {
       type: Boolean,

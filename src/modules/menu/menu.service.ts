@@ -8,6 +8,13 @@ import { IMenu } from "./menu.interface";
 import { Menu } from "./menu.model";
 
 const createMenu = async (payload: IMenu, files: Express.Multer.File[]) => {
+  if (files.length === 0) {
+    throw new AppError(
+      "Please provide at least one image",
+      StatusCodes.BAD_REQUEST
+    );
+  }
+
   let images: { public_id: string; url: string }[] = [];
 
   // ----- Handle file uploads -----
@@ -128,7 +135,6 @@ const getMenuById = async (menuId: string) => {
   };
 };
 
-
 const updateMenu = async (menuId: string, payload: IMenu, files: any) => {
   const isMenuExist = await Menu.findById(menuId);
   if (!isMenuExist) {
@@ -171,9 +177,11 @@ const updateMenu = async (menuId: string, payload: IMenu, files: any) => {
       name: payload.name,
       category: payload.category,
       description: payload.description,
+      sizes: payload.sizes,
+      pieces: payload.pieces,
       price: payload.price,
       ingredients: payload.ingredients,
-      images: images, 
+      images: images,
     },
     { new: true }
   );

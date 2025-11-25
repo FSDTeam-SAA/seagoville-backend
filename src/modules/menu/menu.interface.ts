@@ -6,11 +6,9 @@ export interface IMenu {
     public_id: string;
     url: string;
   }[];
-  price: {
-    small: number;
-    medium: number;
-    large: number;
-  };
+  sizes?: string[];
+  pieces?: number[];
+  price: number[];
   isAvailable: boolean;
   totalSold: number;
   ingredients: string[];
